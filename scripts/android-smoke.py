@@ -1,5 +1,6 @@
 """Native Android smoke evidence. This does not certify gesture/visual parity."""
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -14,9 +15,20 @@ def adb(*args, binary=False):
     return subprocess.check_output(['adb', *args], text=not binary)
 
 def tree():
-    adb('shell', 'uiautomator', 'dump', '/sdcard/codemate-ui.xml')
-    xml = adb('shell', 'cat', '/sdcard/codemate-ui.xml')
-    return ET.fromstring(xml), xml
+    # uiautomator can return success with a null root during a window update.
+    # Never read a previous dump and treat it as the current screen.
+    last = None
+    for _ in range(4):
+        path = '/sdcard/codemate-ui.xml'
+        try:
+            adb('shell', 'rm', '-f', path)
+            adb('shell', 'uiautomator', 'dump', path)
+            raw = adb('shell', 'cat', path)
+            return ET.fromstring(raw), raw
+        except (subprocess.CalledProcessError, ET.ParseError) as error:
+            last = error
+            time.sleep(.5)
+    raise RuntimeError('Could not read a fresh Android UI snapshot') from last
 
 def node(label):
     root, _ = tree()
@@ -36,7 +48,7 @@ def record(name):
     (out / (name+'.png')).write_bytes(adb('exec-out','screencap','-p',binary=True))
 
 try:
-    adb('install', '-r', 'android/app/build/outputs/apk/release/app-release.apk')
+    adb('install', '-r', os.environ.get('APK_PATH', 'android/app/build/outputs/apk/release/app-release.apk'))
     adb('logcat','-c')
     adb('shell','am','start','-n','com.kpdaze.codemate/.MainActivity')
     deadline = time.monotonic()+60
@@ -82,6 +94,10 @@ try:
     node('Edit')
     checks.append('Layers and Preview remain accessible')
 finally:
+    try:
+        record('smoke-final')
+    except Exception as error:
+        print('Final UI capture unavailable:', error, flush=True)
     (out/'logcat.txt').write_text(adb('logcat','-d'))
     (out/'smoke-result.json').write_text(json.dumps({
         'passed': checks,

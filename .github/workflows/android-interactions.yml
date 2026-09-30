@@ -5,7 +5,7 @@ on:
       build_run:
         description: Run containing the built android-verification APK
         required: true
-        default: '36676708293'
+        default: '36678898215'
 permissions:
   contents: read
   actions: read
@@ -35,7 +35,9 @@ jobs:
           arch: x86_64
           target: google_apis
           profile: pixel_2
-          script: python3 -u scripts/android-interactions.py
+          script: |
+            python3 -u scripts/android-smoke.py
+            python3 -u scripts/android-interactions.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

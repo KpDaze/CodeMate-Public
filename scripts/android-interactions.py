@@ -16,9 +16,20 @@ def adb(*args, binary=False):
     return subprocess.check_output(['adb', *map(str, args)], text=not binary, timeout=45)
 
 def tree():
-    adb('shell', 'uiautomator', 'dump', '/sdcard/codemate-ui.xml')
-    raw = adb('shell', 'cat', '/sdcard/codemate-ui.xml')
-    return ET.fromstring(raw), raw
+    # uiautomator can return success with a null root during a window update.
+    # Never read a previous dump and treat it as the current screen.
+    last = None
+    for _ in range(4):
+        path = '/sdcard/codemate-ui.xml'
+        try:
+            adb('shell', 'rm', '-f', path)
+            adb('shell', 'uiautomator', 'dump', path)
+            raw = adb('shell', 'cat', path)
+            return ET.fromstring(raw), raw
+        except (subprocess.CalledProcessError, ET.ParseError) as error:
+            last = error
+            time.sleep(.5)
+    raise RuntimeError('Could not read a fresh Android UI snapshot') from last
 
 def node(label, root=None):
     if root is None:
