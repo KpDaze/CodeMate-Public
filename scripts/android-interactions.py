@@ -46,7 +46,14 @@ def center(b):
     return ((b[0]+b[2])//2, (b[1]+b[3])//2)
 
 def tap(label):
-    adb('shell', 'input', 'tap', *center(bounds(label)))
+    root,_ = tree()
+    matches = [n for n in root.iter('node') if label in (n.get('resource-id'), n.get('content-desc'), n.get('text'))]
+    if not matches:
+        raise AssertionError(f'Native control not found: {label}')
+    # A visible field caption and its actual button can share a label.
+    chosen = next((n for n in matches if n.get('clickable') == 'true'), matches[0])
+    rect = tuple(map(int, re.findall(r'\d+', chosen.get('bounds'))))
+    adb('shell', 'input', 'tap', *center(rect))
 
 def gesture(start, end, hold=False):
     adb('shell', 'input', 'draganddrop' if hold else 'swipe', *start, *end, 1200 if hold else 400)
@@ -68,6 +75,9 @@ def reset():
     raise AssertionError('App did not relaunch')
 
 def check(name, fn):
+    selected = os.environ.get('CHECKS', '').split(',')
+    if selected != [''] and name not in selected:
+        return
     print('START', name, flush=True)
     try:
         reset()
@@ -156,7 +166,9 @@ def content():
     b = bounds('Good morning')
     frame = bounds('element-greeting')
     x,y = center(b)
-    gesture((x,y),(x,y+110),hold=True)
+    # The app preserves the ZIP's 450 ms word hold. Android's canned
+    # draganddrop holds only 400 ms; move slowly through the hold threshold.
+    adb('shell','input','swipe',x,y,x,y+110,4000)
     a = bounds('Good morning')
     f = bounds('element-greeting')
     assert a[1] > b[1]+40, (b,a)
@@ -230,6 +242,9 @@ check('words-inside-box',content)
 check('colour-sync-and-eyedropper',colour)
 check('font-search-and-weight',font_and_weight)
 check('wording-and-size',wording)
-(out/'logcat.txt').write_text(adb('logcat','-d'))
+capture = subprocess.run(['adb', 'logcat', '-d', '-t', '3000'], capture_output=True, text=True, timeout=45)
+(out/'logcat.txt').write_text(capture.stdout)
+if capture.returncode:
+    (out/'logcat-capture-warning.txt').write_text(capture.stderr)
 if any(not r['passed'] for r in results):
     raise SystemExit(1)

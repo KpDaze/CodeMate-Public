@@ -6,6 +6,10 @@ on:
         description: Run containing the built android-verification APK
         required: true
         default: '36678898215'
+      checks:
+        description: Optional comma-separated interaction names; blank runs all checks
+        required: false
+        default: ''
 permissions:
   contents: read
   actions: read
@@ -30,13 +34,14 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         env:
           APK_PATH: built/android/app/build/outputs/apk/release/app-release.apk
+          CHECKS: ${{ inputs.checks }}
         with:
           api-level: 35
           arch: x86_64
           target: google_apis
           profile: pixel_2
           script: |
-            python3 -u scripts/android-smoke.py
+            if [ -z "$CHECKS" ]; then python3 -u scripts/android-smoke.py; fi
             python3 -u scripts/android-interactions.py
       - uses: actions/upload-artifact@v4
         if: always()

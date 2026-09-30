@@ -98,7 +98,10 @@ finally:
         record('smoke-final')
     except Exception as error:
         print('Final UI capture unavailable:', error, flush=True)
-    (out/'logcat.txt').write_text(adb('logcat','-d'))
+    capture = subprocess.run(['adb', 'logcat', '-d', '-t', '3000'], capture_output=True, text=True, timeout=45)
+    (out/'logcat.txt').write_text(capture.stdout)
+    if capture.returncode:
+        (out/'logcat-capture-warning.txt').write_text(capture.stderr)
     (out/'smoke-result.json').write_text(json.dumps({
         'passed': checks,
         'not_verified': ['pixel/visual parity with ZIP','direct dragging and sibling crossing','all resize handles and viewport stability','content positioning gestures','floating editor dragging while canvas scrolls','eyedropper sampled output','keyboard interaction and font weights on device'],
