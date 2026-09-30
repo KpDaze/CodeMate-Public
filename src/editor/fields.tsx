@@ -50,7 +50,12 @@ export function FontField({
       <Button
         label="Font"
         onPress={() => setOpen(!open)}
-        style={{ height: 36, backgroundColor: C.desk, paddingHorizontal: 12 }}
+        style={{
+          height: 36,
+          borderRadius: 16,
+          backgroundColor: C.desk,
+          paddingHorizontal: 12,
+        }}
       >
         <View
           style={[s.row, { width: "100%", justifyContent: "space-between" }]}
@@ -60,6 +65,7 @@ export function FontField({
             style={{
               fontFamily: nativeFont(family, "regular"),
               fontSize: 28,
+              lineHeight: 28 * 1.15,
               flexShrink: 1,
             }}
           >
@@ -69,7 +75,7 @@ export function FontField({
         </View>
       </Button>
       {open ? (
-        <View style={{ backgroundColor: C.desk, borderRadius: 8 }}>
+        <View style={{ backgroundColor: C.desk, borderRadius: 16 }}>
           <TextInput
             accessibilityLabel="Search fonts"
             testID="font-search"
@@ -117,6 +123,7 @@ export function FontField({
                     style={{
                       fontFamily: nativeFont(font.id, "regular"),
                       fontSize: 16,
+                      lineHeight: 16 * 1.15,
                     }}
                   >
                     {font.label}
@@ -146,7 +153,7 @@ export function WeightField({
       <Button
         label="Weight"
         onPress={() => setOpen(!open)}
-        style={{ height: 36, backgroundColor: C.desk }}
+        style={{ height: 36, borderRadius: 16, backgroundColor: C.desk }}
       >
         <View
           style={[s.row, { width: "100%", justifyContent: "space-between" }]}
@@ -156,7 +163,7 @@ export function WeightField({
         </View>
       </Button>
       {open ? (
-        <View style={{ backgroundColor: C.desk, borderRadius: 8 }}>
+        <View style={{ backgroundColor: C.desk, borderRadius: 16 }}>
           {weightsFor(family).map((weight) => (
             <Button
               key={weight}
@@ -167,7 +174,7 @@ export function WeightField({
               }}
               style={{ height: 36, alignItems: "flex-start" }}
             >
-              {WEIGHT_LABEL[weight]}
+              <Label>{WEIGHT_LABEL[weight]}</Label>
             </Button>
           ))}
         </View>
@@ -208,7 +215,12 @@ export function NumberField({
         style={[
           s.input,
           decimal
-            ? { height: 44, fontSize: 16, paddingHorizontal: 12 }
+            ? {
+                height: 44,
+                borderRadius: 16,
+                fontSize: 16,
+                paddingHorizontal: 12,
+              }
             : { width: 64 },
         ]}
         onChangeText={(text) => {
@@ -246,7 +258,7 @@ export function Choices<T extends string>({
         accessibilityLabel={label}
         style={[
           s.row,
-          { gap: 4, padding: 4, borderRadius: 8, backgroundColor: C.desk },
+          { gap: 4, padding: 4, borderRadius: 16, backgroundColor: C.desk },
         ]}
       >
         {options.map((o) => (
@@ -257,6 +269,10 @@ export function Choices<T extends string>({
             style={{
               flex: 1,
               backgroundColor: o.id === value ? C.surface : "transparent",
+              boxShadow:
+                o.id === value
+                  ? "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)"
+                  : undefined,
             }}
           >
             <Label

@@ -109,7 +109,7 @@ export function EditorShell() {
                 width: 32,
                 height: 32,
                 backgroundColor: C.accent,
-                borderRadius: 8,
+                borderRadius: 16,
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -289,7 +289,7 @@ export function EditorShell() {
                     onPress={() => setLayers(false)}
                     style={{ height: 44, paddingHorizontal: 16 }}
                   >
-                    Close
+                    <Label>Close</Label>
                   </Button>
                 </View>
                 <View

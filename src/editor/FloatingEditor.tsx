@@ -121,7 +121,7 @@ export function FloatingEditor({ onClose }: { onClose: () => void }) {
         top: place.y,
         width: Math.min(260, runtime.viewport.width - 48),
         maxHeight: Math.min(runtime.viewport.height * 0.72, 512),
-        borderRadius: 12,
+        borderRadius: 24,
         backgroundColor: C.surface,
         overflow: "hidden",
         boxShadow: "0 12px 40px rgba(20,24,40,0.16)",
@@ -137,7 +137,7 @@ export function FloatingEditor({ onClose }: { onClose: () => void }) {
             style={{
               width: 32,
               height: 32,
-              borderRadius: 8,
+              borderRadius: 16,
               backgroundColor: C.soft,
               alignItems: "center",
               justifyContent: "center",
@@ -226,7 +226,11 @@ export function FloatingEditor({ onClose }: { onClose: () => void }) {
           <ScrollView
             nestedScrollEnabled
             keyboardShouldPersistTaps="handled"
-            style={{ maxHeight: 160, backgroundColor: C.desk, borderRadius: 8 }}
+            style={{
+              maxHeight: 160,
+              backgroundColor: C.desk,
+              borderRadius: 16,
+            }}
           >
             {controlsFor(element).map((id, i, list) => (
               <Button
@@ -279,7 +283,7 @@ function AlignRow({ element }: { element: VisualElement }) {
     <View
       style={[
         s.row,
-        { gap: 4, padding: 2, borderRadius: 6, backgroundColor: C.desk },
+        { gap: 4, padding: 2, borderRadius: 12, backgroundColor: C.desk },
       ]}
       accessibilityLabel="Align"
     >
@@ -291,16 +295,17 @@ function AlignRow({ element }: { element: VisualElement }) {
             label={o.label}
             selected={selected}
             onPress={() =>
-              useEditor
-                .getState()
-                .patchText(element.id, {
-                  align: o.id,
-                  placeX: o.id === "left" ? 0 : o.id === "center" ? 50 : 100,
-                })
+              useEditor.getState().patchText(element.id, {
+                align: o.id,
+                placeX: o.id === "left" ? 0 : o.id === "center" ? 50 : 100,
+              })
             }
             style={{
               flex: 1,
               backgroundColor: selected ? C.surface : "transparent",
+              boxShadow: selected
+                ? "0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)"
+                : undefined,
             }}
           >
             <View style={{ width: 20, gap: 4 }}>

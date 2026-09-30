@@ -29,9 +29,9 @@ jobs:
       - run: npm run bundle:android
       - run: npm run prebuild:android
       - uses: gradle/actions/setup-gradle@v4
-      - name: Build an emulator APK with bundled JavaScript
+      - name: Build Android APK with bundled JavaScript
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64,arm64-v8a
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -39,12 +39,16 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Native Android UI smoke check
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          APK_PATH: android/app/build/outputs/apk/release/app-release.apk
         with:
           api-level: 35
           arch: x86_64
           target: google_apis
           profile: pixel_2
-          script: python3 scripts/android-smoke.py
+          script: |
+            python3 -u scripts/android-smoke.py
+            python3 -u scripts/android-interactions.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -76,7 +76,7 @@ function ColourPad({
       onLayout={(e) => {
         size.current = e.nativeEvent.layout;
       }}
-      style={{ height: hueOnly ? 8 : 64, borderRadius: hueOnly ? 99 : 6 }}
+      style={{ height: hueOnly ? 8 : 64, borderRadius: hueOnly ? 99 : 12 }}
     >
       {hueOnly ? (
         <LinearGradient
@@ -106,7 +106,7 @@ function ColourPad({
               bottom: 0,
               left: 0,
               right: 0,
-              borderRadius: 6,
+              borderRadius: 12,
             }}
           />
           <LinearGradient
@@ -118,7 +118,7 @@ function ColourPad({
               bottom: 0,
               left: 0,
               right: 0,
-              borderRadius: 6,
+              borderRadius: 12,
             }}
           />
         </>

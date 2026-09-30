@@ -19,7 +19,17 @@ export const C = {
   desk: "#eef0f3",
 };
 export function Label({ style, ...props }: TextProps) {
-  return <Text allowFontScaling={false} {...props} style={[s.text, style]} />;
+  const fontSize = StyleSheet.flatten(style)?.fontSize ?? 14;
+  const lineHeight =
+    ({ 12: 16, 14: 20, 16: 24, 18: 28 } as Record<number, number>)[fontSize] ??
+    fontSize * 1.5;
+  return (
+    <Text
+      allowFontScaling={false}
+      {...props}
+      style={[s.text, { lineHeight }, style]}
+    />
+  );
 }
 export function Button({
   children,
@@ -60,7 +70,7 @@ export const s = StyleSheet.create({
   column: { gap: 4 },
   button: {
     height: 32,
-    borderRadius: 6,
+    borderRadius: 12,
     paddingHorizontal: 8,
     alignItems: "center",
     justifyContent: "center",
@@ -72,7 +82,7 @@ export const s = StyleSheet.create({
     paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: C.line,
-    borderRadius: 6,
+    borderRadius: 12,
     fontSize: 14,
     color: C.ink,
     backgroundColor: C.surface,

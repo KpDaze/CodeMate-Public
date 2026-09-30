@@ -162,18 +162,50 @@ def colour():
     assert picked != before and re.fullmatch(r'#[0-9a-fA-F]{6}',picked), (before,picked)
     tap('hex')
     adb('shell','input','keyevent','KEYCODE_MOVE_END',*(['KEYCODE_DEL']*8))
-    adb('shell','input','text','336699')
+    adb('shell','input','text',"'#336699'")
     adb('shell','input','keyevent','KEYCODE_BACK')
     exact = node('hex').get('text')
-    assert exact.lstrip('#').lower() == '336699', exact
+    assert exact.lower() == '#336699', exact
+    assert node('#336699').get('selected') == 'true'
     record('hex-edit')
     tap('Eyedropper')
     cover = bounds('element-cover')
     # Visible sunset sun center, derived from the observed native SVG geometry.
     adb('shell','input','tap',829,625)
     sampled = node('hex').get('text')
+    for _ in range(5):
+        if sampled.lower() != exact.lower():
+            break
+        time.sleep(.2)
+        sampled = node('hex').get('text')
     assert sampled.lower() == '#ffe7b3', sampled
     return {'initial':before,'picker':picked,'exact_hex':exact,'image_sample':sampled}
+
+def font_and_weight():
+    tap('edit'); tap('more'); tap('control-font'); tap('font-search')
+    adb('shell','input','text','Libre')
+    adb('shell','input','keyevent','KEYCODE_BACK')
+    tap('font-Libre Baskerville')
+    tap('more'); tap('control-weight'); tap('Weight')
+    root,_ = tree()
+    node('Regular',root); node('Bold',root)
+    assert not any(n.get('text') == 'Medium' for n in root.iter('node'))
+    tap('Bold')
+    node('Bold')
+    return {'family':'Libre Baskerville','selected_weight':'Bold','available_weights':['Regular','Bold']}
+
+def wording():
+    tap('edit'); tap('more'); tap('control-words'); tap('words')
+    adb('shell','input','keyevent','KEYCODE_MOVE_END',*(['KEYCODE_DEL']*20))
+    adb('shell','input','text','Good%sevening')
+    adb('shell','input','keyevent','KEYCODE_BACK')
+    root,_ = tree()
+    heading = node('element-greeting',root)
+    assert any(n.get('text') == 'Good evening' for n in heading.iter('node'))
+    tap('more'); tap('control-size')
+    tap('Larger')
+    node('41')
+    return {'wording':'Good evening','font_size':41}
 
 adb('install','-r',os.environ['APK_PATH'])
 adb('logcat','-c')
@@ -185,6 +217,8 @@ for edge in ['n','s','e','w','ne','nw','se','sw']:
 check('floating-editor-scroll',floating)
 check('words-inside-box',content)
 check('colour-sync-and-eyedropper',colour)
+check('font-search-and-weight',font_and_weight)
+check('wording-and-size',wording)
 (out/'logcat.txt').write_text(adb('logcat','-d'))
 if any(not r['passed'] for r in results):
     raise SystemExit(1)

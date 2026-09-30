@@ -30,7 +30,9 @@ export function measure(ref: RefObject<View | null>): Promise<Rect | null> {
       resolve(null);
       return;
     }
-    node.measureInWindow((x, y, width, height) =>
+    // Touch pageX/pageY and these page coordinates share the React root.
+    // measureInWindow subtracts the Android status bar, offsetting image picks.
+    node.measure((_localX, _localY, width, height, x, y) =>
       resolve({ x, y, width, height }),
     );
   });

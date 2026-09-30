@@ -104,6 +104,12 @@ export function ElementView({ id }: { id: string }) {
   const pull = useRef(new Animated.Value(0)).current;
   const pullNumber = useRef(0);
   const drag = useRef<Drag | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearHold = () => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+  };
+  useEffect(() => () => clearHold(), []);
   const latest = useRef({ element, visual, editing, selected, runtime });
   latest.current = { element, visual, editing, selected, runtime };
   useEffect(() => {
@@ -142,6 +148,7 @@ export function ElementView({ id }: { id: string }) {
       word: null,
       fingerY: y,
     };
+    clearHold();
     drag.current = d;
     void Promise.all([measure(frame), measure(slot), measure(words)]).then(
       ([f, s, w]) => {
@@ -155,10 +162,23 @@ export function ElementView({ id }: { id: string }) {
             w &&
             (f.width - w.width >= 8 || f.height - w.height >= 8),
         );
+        if (d.selected && id !== latest.current.visual.rootId) {
+          // Android's native ScrollView otherwise intercepts vertical movement
+          // before the JS responder can claim the original deliberate drag.
+          const delay = Math.max(
+            0,
+            (d.words ? 450 : 180) - (Date.now() - d.time),
+          );
+          holdTimer.current = setTimeout(() => {
+            if (drag.current === d && !d.cancelled)
+              latest.current.runtime.setBusy(true);
+          }, delay);
+        }
       },
     );
   };
   const finish = () => {
+    clearHold();
     drag.current = null;
     pullNumber.current = 0;
     pull.setValue(0);
@@ -346,6 +366,26 @@ export function ElementView({ id }: { id: string }) {
         {...pan.panHandlers}
         onLayout={compensate}
         onTouchStart={(e) => start(e, false)}
+        onTouchMove={(e) => {
+          const d = drag.current;
+          if (!d || d.claimed) return;
+          const dx = e.nativeEvent.pageX - d.x;
+          const dy = e.nativeEvent.pageY - d.y;
+          const elapsed = Date.now() - d.time;
+          if (
+            (d.words && elapsed < 450 && Math.hypot(dx, dy) > 28) ||
+            (!d.words &&
+              elapsed <= 180 &&
+              Math.abs(dy) > Math.max(8, Math.abs(dx)))
+          ) {
+            d.cancelled = true;
+            clearHold();
+            latest.current.runtime.setBusy(false);
+          }
+        }}
+        onTouchCancel={() => {
+          if (!drag.current?.claimed) finish();
+        }}
         onTouchEnd={(e) => {
           if (!editing) return;
           e.stopPropagation();
@@ -357,6 +397,7 @@ export function ElementView({ id }: { id: string }) {
             Math.hypot(e.nativeEvent.pageX - d.x, e.nativeEvent.pageY - d.y) < 8
           )
             useEditor.getState().select(id);
+          if (!d?.claimed) finish();
         }}
         style={[
           frameStyle,
@@ -373,7 +414,7 @@ export function ElementView({ id }: { id: string }) {
               width: "100%",
               height: "100%",
               overflow: "hidden",
-              borderRadius: 12,
+              borderRadius: 24,
             }}
           >
             <CoverArt label={element.name} />
