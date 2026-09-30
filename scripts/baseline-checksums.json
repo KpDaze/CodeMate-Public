@@ -1,0 +1,13 @@
+{
+  "archive_sha256": "9fd3b612b332202070f313af5619dee61e4439c79967ae1a1a4ef5793780905d",
+  "production_files": {
+    "src/model/color.ts": "33d98abce0b765b79474fbc8b36c4dfa52f20661b76fd4cf0c0031e788b81474",
+    "src/model/demo-document.ts": "418795bc01d68be903c6c86d80e3ca37d46c55d3394389c1fcdf63ef236ce85f",
+    "src/model/edit.ts": "d1064156009641258979b3fb3dd4eff06324b176e0e104db5dc858e66549aa8a",
+    "src/model/fonts.ts": "363d728516ef64a1d2bd9c4ad70d0398e7e087e68af408b89b5717fe59c7c956",
+    "src/model/labels.ts": "09b6074b3b22c6bd22a25cb45e711f37b797fd3d5d150e927f076c1fd7d656c1",
+    "src/model/queries.ts": "8f64e66018ad02247716aac8c1203d8524485c55fc2080c9684d3033cb60bef2",
+    "src/model/types.ts": "c365133c4ba50823ba806ea88192f0c8f0fbfae0a1d1a8af2d717dcbe22daf2e",
+    "src/editor/store.ts": "238ca6329cfef2a0078a0eb6f26989f25053c009612ec5cacc90ff947395bf96"
+  }
+}

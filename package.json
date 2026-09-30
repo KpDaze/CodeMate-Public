@@ -1,0 +1,51 @@
+{
+  "name": "codemate",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --android",
+    "android": "npm run prebuild:android && expo run:android",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/model/*.test.ts",
+    "bundle:android": "expo export --platform android",
+    "prebuild:android": "expo prebuild --platform android --no-install --template expo-template-bare-minimum@56.0.37"
+  },
+  "dependencies": {
+    "@expo-google-fonts/atkinson-hyperlegible": "^0.4.1",
+    "@expo-google-fonts/barlow-condensed": "^0.4.1",
+    "@expo-google-fonts/eb-garamond": "^0.4.3",
+    "@expo-google-fonts/fraunces": "^0.4.1",
+    "@expo-google-fonts/ibm-plex-mono": "^0.4.1",
+    "@expo-google-fonts/instrument-serif": "^0.4.1",
+    "@expo-google-fonts/josefin-sans": "^0.4.2",
+    "@expo-google-fonts/libre-baskerville": "^0.4.3",
+    "@expo-google-fonts/merriweather": "^0.4.2",
+    "@expo-google-fonts/nunito": "^0.4.2",
+    "@expo-google-fonts/playfair-display": "^0.4.2",
+    "@expo-google-fonts/source-sans-3": "^0.4.1",
+    "@expo-google-fonts/source-serif-4": "^0.4.1",
+    "@expo-google-fonts/space-grotesk": "^0.4.1",
+    "base64-js": "^1.5.1",
+    "expo": "~56.0.23",
+    "expo-font": "~56.0.7",
+    "expo-linear-gradient": "~56.0.4",
+    "expo-splash-screen": "~56.0.15",
+    "expo-system-ui": "~56.0.5",
+    "lucide-react-native": "^1.49.0",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "^15.15.4",
+    "react-native-view-shot": "^5.1.0",
+    "upng-js": "^2.1.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "~19.2.2",
+    "@types/upng-js": "^2.1.5",
+    "prettier": "^3.4.2",
+    "typescript": "~5.9.2"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "CodeMate",
+    "slug": "codemate",
+    "version": "0.1.0",
+    "platforms": ["android"],
+    "userInterfaceStyle": "light",
+    "android": { "package": "com.kpdaze.codemate" }
+  }
+}
