@@ -259,7 +259,7 @@ export function ElementView({ id }: { id: string }) {
           if (!d.axis)
             d.axis = Math.abs(g.dx) > Math.abs(g.dy) ? "across" : "order";
           if (d.axis === "across") {
-            const left = f.x - s.x + g.dx;
+            const left = f.x - s.x + (g.moveX - d.x);
             const free = s.width - f.width;
             if (free >= 8)
               state.patch(id, {

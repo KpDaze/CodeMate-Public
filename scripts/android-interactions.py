@@ -89,7 +89,7 @@ def across():
     x,y = center(before)
     gesture((x,y), (x+70,y))
     after = bounds('element-greeting')
-    assert after[0] > before[0]+30, (before,after)
+    assert 58 <= after[0] - before[0] <= 74, (before,after)
     assert abs(after[1]-before[1]) < 4, (before,after)
     assert abs((after[2]-after[0])-(before[2]-before[0])) < 4
     return {'before': before, 'after': after}
